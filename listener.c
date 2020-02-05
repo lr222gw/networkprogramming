@@ -55,9 +55,11 @@ void *get_in_addr(struct sockaddr *sa)
 
 int main(void)
 {
-	//TEST; Git 
+	//!!NOTERA; Övningsuppgiften för UDP är klar här...
 	int sockfd;
-	struct addrinfo hints, *servinfo, *p;
+	struct addrinfo hints, 
+					*servinfo, 	// Kommer innehålla en Länkad lista med addrinfo (??), nästa node i listan finns i 'ai_next' 
+					*p;
 	int rv;
 	int numbytes;
 	struct sockaddr_storage their_addr;
