@@ -18,6 +18,8 @@
 
 int main(int argc, char *argv[])
 {
+	//!!NOTERA; Övningsuppgiften för UDP är klar här...
+
 	int sockfd;
 	struct addrinfo hints, *servinfo, *p;
 	int rv;
