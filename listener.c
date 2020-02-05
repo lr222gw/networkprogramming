@@ -55,6 +55,7 @@ void *get_in_addr(struct sockaddr *sa)
 
 int main(void)
 {
+	//TEST; Git 
 	int sockfd;
 	struct addrinfo hints, *servinfo, *p;
 	int rv;
