@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 	}
 
 	printf("servinfo som används:\n");
-	for(p = servinfo; p != NULL; p = p->ai_next) {
+	for(struct addrinfo *p = servinfo; p != NULL; p = p->ai_next) {
 		printf("\tservinfo,hints; \n\t\tFamily/Domain: %d \n\t\tSockType: %d \n\t\tProtocol: %d \n",
 							 p->ai_family,		//
 							 p->ai_socktype, 	//
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 	
 	//Printf för Custom test; Innehpllet på servinfo2 (Jämför med servinfo)
 	printf("servinfo för test:\n");
-	for(p = servinfo2; p != NULL; p = p->ai_next) {
+	for(struct addrinfo *p = servinfo2; p != NULL; p = p->ai_next) {
 		printf("\tservinfo2,hints2; \n\t\tFamily/Domain: %d \n\t\tSockType: %d \n\t\tProtocol: %d \n",
 							 p->ai_family,		//
 							 p->ai_socktype, 	//
@@ -117,7 +117,8 @@ int main(int argc, char *argv[])
 										// Dock fungerar detta bara med IPv4 adresser, då IPv6 adresser är längre
 	char *myAdd=&myAddress;		
 
-	int myAdd_len = sizeof(myAddress); 
+	//int myAdd_len = sizeof(myAddress); 
+	socklen_t myAdd_len = sizeof(myAddress); 
 
 	struct sockaddr_in 	local_sin;							// i denna ska vi lagra innehållet av socketen!
 	socklen_t 			local_sinlen = sizeof(local_sin);	// Storleken av datatypen för "sockaddr_in"
@@ -135,14 +136,15 @@ int main(int argc, char *argv[])
 		// Den behöver information för socketen behöver anges för att översättning ska kunna göras!
 	myAdd=inet_ntop(local_sin.sin_family,					// Domän/Familj som vår socket använder
 					&local_sin.sin_addr,					// Adressen till IPAdressen som vår socket använder ()
-					&myAddress,								// En char-array för att lagra IP-adressen som 'sträng'
-					&myAdd_len);							// Storleken av vår char array.... SKA VARA INTE REFERENS
+					myAddress,								// En char-array för att lagra IP-adressen som 'sträng'
+					myAdd_len);							// Storleken av vår char array.... SKA VARA INTE REFERENS
 
 	printf("Before \tSend>> Sending from  %s:%d \n", myAdd, ntohs(local_sin.sin_port));
 
 	//För varje argument vi skickar till ./talker (antalet beskrivet av argc)
 	//gör vi en enskild sendto; Vi kan alltså skicka flera meddelanden genom att separera dem med "Mellanslag"
 	for(int q=2;q<argc;q++){
+		//När väl Sendto körs så kommer även Port väljas (genom kerneln), därav har vi inget portnummer innan sendto körts
 		if ((numbytes = sendto(sockfd,			//Ange socketDescriptor ID  
 								argv[q],			//Ange vilken av parametrarna (meddelanderna) vi ska skicka
 								strlen(argv[q]), 	//ange storleken av meddelandet

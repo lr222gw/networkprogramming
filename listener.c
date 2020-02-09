@@ -16,7 +16,9 @@
 
 #define MYPORT "4950"	// the port users will be connecting to
 
-#define MAXBUFLEN 100
+#define MAXBUFLEN 295
+// #define MAXBUFLEN 250
+//#define MAXBUFLEN 300
 
 // Helper function you can use:
 
@@ -105,13 +107,31 @@ int main(void)
 	char myAddress[20];
 	char *myAdd=&myAddress;
 
+	int	 myAddress_len = sizeof(myAddress);
+	//socklen_t	myAddress_len_2 = (socklen_t)sizeof(myAddress);	<- Bör vara mer rätt då socklen_t är en unsigned_int... 
+
 	struct sockaddr_in local_sin;
 	socklen_t local_sinlen = sizeof(local_sin);
 	getsockname(sockfd,(struct sockaddr*)&local_sin, &local_sinlen);
 	
-	myAdd=inet_ntop(local_sin.sin_family,&local_sin.sin_addr,myAddress,sizeof(myAddress));
+	//myAdd=inet_ntop(local_sin.sin_family,&local_sin.sin_addr,myAddress,sizeof(myAddress)); <- myAdress skulle va en pekare
+	myAdd=inet_ntop(local_sin.sin_family,&local_sin.sin_addr,myAddress, &myAddress_len);
+	
+	//char 		myAddr2_err[INET6_ADDRSTRLEN]; 		//Note; All arrays are stores on the heap.... 'ptr by standard...'
+	//char		myAddr2_ret[INET6_ADDRSTRLEN]; 
+	//char 		*myAddr2_ret_ptr = &myAddr2_ret;
+	char		myAddr2[INET6_ADDRSTRLEN];
+	char		*myAddr2_ptr = &myAddr2; 
+	socklen_t	myAddr2_len = sizeof(myAddr2);
+
+	myAddr2_ptr = inet_ntop(local_sin.sin_family,&local_sin.sin_addr, myAddr2, myAddr2_len);
+	
 	printf("Listening on %s:%d \n", myAdd, atoi(MYPORT));
 	printf("Listening on %s:%d \n", myAdd, ntohs(local_sin.sin_port));
+	printf("Listening on %s:%d \n", myAddr2, 	 ntohs(local_sin.sin_port));
+	printf("Listening on %s:%d \n", myAddr2_ptr, ntohs(local_sin.sin_port));
+	//printf("Listening on %s:%d \n", myAdd, ntohs(local_sin.sin_port));
+	
 	freeaddrinfo(servinfo);
 
 	printf("listener: waiting to recvfrom...\n");
@@ -122,6 +142,9 @@ int main(void)
 	*/
 
 	char mySend[100000];
+	//recvfrom(sockfd, buf, MAXBUFLEN-1 , 0, (struct sockaddr *)&their_addr, &addr_len);
+	//putchar('\n');
+	//printf("Spoolo\n");
 	
 	while(1){
 		addr_len = sizeof their_addr;
@@ -132,6 +155,7 @@ int main(void)
 		}
 
 		the_addr=(struct sockaddr_in*)&their_addr;
+		
 		printf("listener: from %s:%d ",
 			inet_ntop(their_addr.ss_family,
 				get_in_addr((struct sockaddr *)&their_addr),
